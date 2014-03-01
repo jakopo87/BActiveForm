@@ -281,4 +281,39 @@ class BActiveForm extends CWidget
         return $render;
     }
 
+    /**
+     * Render a text editor
+     * @param object $model Model object;
+     * @param string $attribute Name of the attribute;
+     * @param array $htmlOptions    List of attributes and other options:<br/>
+     *                              string <b>ruleSet<b/>: ruleset for wysihtml5, allowed values are: simple, advanced;
+     *                              see {@link BHtml::textArea()};
+     * @return string
+     */
+    public function textEditor($model, $attribute, $htmlOptions = array())
+    {
+        //HACK: $htmlOptions is passed by value, so we do not see 'id' outside the textarea() method
+        CHtml::resolveNameID($model, $attribute, $htmlOptions);
+        $this->addClass('wysihtml5-textarea', $htmlOptions);
+
+        $ruleSet = isset($htmlOptions['ruleSet']) ? $this->getOption('ruleSet', $htmlOptions) : 'simple';
+
+        $render = $this->textArea($model, $attribute, $htmlOptions);
+
+        $assetsFolder = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
+        Yii::app()->clientScript->registerCssFile("{$assetsFolder}/wysihtml5/stylesheet.css");
+        Yii::app()->clientScript->registerScriptFile("{$assetsFolder}/wysihtml5/parser_rules/{$ruleSet}.js", CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile("{$assetsFolder}/wysihtml5/wysihtml5-0.3.0.min.js", CClientScript::POS_END);
+
+        Yii::app()->clientScript->registerScript('script', <<<JS
+var editor = new wysihtml5.Editor("{$htmlOptions['id']}", { // id of textarea element
+    toolbar: "wysihtml5-toolbar", // id of toolbar element
+    parserRules: "$ruleSet"
+});
+JS
+                , CClientScript::POS_READY);
+
+        return $render;
+    }
+
 }
