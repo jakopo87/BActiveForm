@@ -5,7 +5,8 @@ Active Form widget based on BootstrapYii.
 
 Installation
 ------------
-Create a `bActiveForm` folder into the Yii's folder of extentions  (default: protected/extentions).
+First install the [BootstrapYii](https://github.com/jakopo87/BootstrapYii) component, then create a `bActiveForm` folder
+ into the Yii's folder of extentions  (default: protected/extentions).
 
 Usage
 -----
