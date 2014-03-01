@@ -208,4 +208,28 @@ class BActiveForm extends CWidget
         return $render;
     }
 
+    /**
+     * Render a radiobutton group.
+     * @param object $model Model object;
+     * @param string $attribute Name of the attribute;
+     * @param array $htmlOptions    List of attributes and other options:<br/>
+     *                              array <b>labelOptions</b>: List of attributes and other options for the label, see
+     *                              {@link BHtml::label()};
+     * @return string
+     */
+    public function radioButtonList($model, $attribute, $data, $htmlOptions = array())
+    {
+        CHtml::resolveNameID($model, $attribute, $htmlOptions);
+
+        $render = BHtml::openFormGroup();
+
+        $value = CHtml::resolveValue($model, $attribute);
+
+        $render.=BHtml::radioButtonList($htmlOptions['name'], $value, $data, $htmlOptions);
+
+        $render.=BHtml::closeFormGroup();
+        
+        return $render;
+    }
+
 }
