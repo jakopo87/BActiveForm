@@ -62,6 +62,30 @@ class BActiveForm extends CWidget
     }
 
     /**
+     * Append one or more classes to $htmlOptions.
+     * @param mixed $class  It can be of two types:<br/>
+     *                      <b>string</b>: name of the class to be added;
+     *                      <b>array</b>: Key-value pair in which the key is the name of the class, and the vlue is an 
+     *                      expression that determines if the class should be added;
+     * @param array $htmlOptions    List of attributes;
+     */
+    private function addClass($class, &$htmlOptions)
+    {
+        if(is_string($class))
+        {
+            $class = array($class => true);
+        }
+
+        foreach($class as $c => $exp)
+        {
+            if($exp === true)
+            {
+                $htmlOptions['class'] = isset($htmlOptions['class']) ? "{$htmlOptions['class']} $c" : $c;
+            }
+        }
+    }
+
+    /**
      * Render the label of a control.
      * @param object $model Model object;
      * @param string $attribute Name of the attribute;
@@ -77,6 +101,22 @@ class BActiveForm extends CWidget
         else
         {
             return '';
+        }
+    }
+
+    /**
+     * Set the validation state.
+     * @param object $model Model object;
+     * @param string $attribute Name of the attribute;
+     * @param array $formGroupOptions List of attributes of the form group;
+     * @param array $inputOptions List of attributes of the input control;
+     */
+    private function setValidationState($model, $attribute, &$formGroupOptions, &$inputOptions)
+    {
+        if($model->hasErrors($attribute))
+        {
+            $inputOptions['helpText'] = implode($model->errors[$attribute]);
+            $this->addClass('has-error', $formGroupOptions);
         }
     }
 
@@ -115,7 +155,10 @@ class BActiveForm extends CWidget
     {
         CHtml::resolveNameID($model, $attribute, $htmlOptions);
 
-        $render = BHtml::openFormGroup();
+        $formGroupOptions = array();
+        $this->setValidationState($model, $attribute, $formGroupOptions, $htmlOptions);
+
+        $render = BHtml::openFormGroup($formGroupOptions);
 
         $render.=$this->renderLabel($model, $attribute, $htmlOptions);
 
@@ -143,7 +186,10 @@ class BActiveForm extends CWidget
         CHtml::resolveNameID($model, $attribute, $htmlOptions);
         $htmlOptions['value'] = CHtml::resolveValue($model, $attribute);
 
-        $render = BHtml::openFormGroup();
+        $formGroupOptions = array();
+        $this->setValidationState($model, $attribute, $formGroupOptions, $htmlOptions);
+
+        $render = BHtml::openFormGroup($formGroupOptions);
 
         $render.=$this->renderLabel($model, $attribute, $htmlOptions);
 
@@ -169,7 +215,10 @@ class BActiveForm extends CWidget
         CHtml::resolveNameID($model, $attribute, $htmlOptions);
         $htmlOptions['value'] = CHtml::resolveValue($model, $attribute);
 
-        $render = BHtml::openFormGroup();
+        $formGroupOptions = array();
+        $this->setValidationState($model, $attribute, $formGroupOptions, $htmlOptions);
+
+        $render = BHtml::openFormGroup($formGroupOptions);
 
         $render.=$this->renderLabel($model, $attribute, $htmlOptions);
 
@@ -204,7 +253,7 @@ class BActiveForm extends CWidget
         $render.=BHtml::checkBoxList($htmlOptions['name'], $value, $data, $htmlOptions);
 
         $render.=BHtml::closeFormGroup();
-        
+
         return $render;
     }
 
@@ -228,7 +277,7 @@ class BActiveForm extends CWidget
         $render.=BHtml::radioButtonList($htmlOptions['name'], $value, $data, $htmlOptions);
 
         $render.=BHtml::closeFormGroup();
-        
+
         return $render;
     }
 
