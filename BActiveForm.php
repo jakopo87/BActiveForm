@@ -294,15 +294,22 @@ class BActiveForm extends CWidget
      * @param object $model Model object;
      * @param string $attribute Name of the attribute;
      * @param array $htmlOptions    List of attributes and other options:<br/>
-     *                              string <b>ruleSet<b/>: ruleset for wysihtml5, allowed values are: simple, advanced;
+     *                              string <b>idToolbar<b/>: id of the editor toolbar;<br/>
+     *                              string <b>ruleSet<b/>: name of the ruleset (included by default: simple, advanced);
      *                              see {@link BHtml::textArea()};
      * @return string
      */
     public function textEditor($model, $attribute, $htmlOptions = array())
     {
-        //TODO: test js
-        //HACK: $htmlOptions is passed by value, so we do not see 'id' outside the textarea() method
+//HACK: $htmlOptions is passed by value, so we do not see 'id' outside the textarea() method
         CHtml::resolveNameID($model, $attribute, $htmlOptions);
+
+        $idToolbar = $this->getOption('idToolbar', $htmlOptions, true);
+        if($idToolbar === NULL)
+        {
+            $idToolbar = $htmlOptions['id'] . '-wysihtml5-toolbar';
+        }
+
         $this->addClass('wysihtml5-textarea', $htmlOptions);
 
         $ruleSet = isset($htmlOptions['ruleSet']) ? $this->getOption('ruleSet', $htmlOptions) : 'simple';
@@ -313,14 +320,13 @@ class BActiveForm extends CWidget
         Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/wysihtml5/parser_rules/{$ruleSet}.js", CClientScript::POS_END);
         Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/wysihtml5/wysihtml5-0.3.0.min.js", CClientScript::POS_END);
 
-        Yii::app()->clientScript->registerScript('script', <<<JS
-var editor = new wysihtml5.Editor("{$htmlOptions['id']}", { // id of textarea element
-    toolbar: "wysihtml5-toolbar", // id of toolbar element
+        Yii::app()->clientScript->registerScript('wysihtml5-' . $htmlOptions['id'], <<<JS
+var editor = new wysihtml5.Editor("{$htmlOptions['id']}", {
+    toolbar: "{$idToolbar}",
     parserRules: "$ruleSet"
 });
 JS
                 , CClientScript::POS_READY);
-
         return $render;
     }
 
@@ -329,6 +335,7 @@ JS
      * @param object $model Model object;
      * @param string $attribute Name of the attribute;
      * @param array $htmlOptions    List of attributes and other options:<br/>
+     *                              array <b>dateTimePickerOptions</b>: List of options for the jQuery plugin;<br/>
      *                              see {@link BHtml::tag()};
      * @return string
      */
