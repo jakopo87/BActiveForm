@@ -326,10 +326,7 @@ class BActiveForm extends CWidget
         Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/wysihtml5/wysihtml5-0.3.0.min.js", CClientScript::POS_END);
 
         Yii::app()->clientScript->registerScript('wysihtml5-' . $htmlOptions['id'], <<<JS
-var editor = new wysihtml5.Editor("{$htmlOptions['id']}", {
-    toolbar: "{$idToolbar}",
-    parserRules: "$ruleSet"
-});
+var editor = new wysihtml5.Editor("{$htmlOptions['id']}",$editorOptionsJSON);
 JS
                 , CClientScript::POS_READY);
         return $render;
