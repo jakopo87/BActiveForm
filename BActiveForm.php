@@ -301,7 +301,7 @@ class BActiveForm extends CWidget
      */
     public function textEditor($model, $attribute, $htmlOptions = array())
     {
-//HACK: $htmlOptions is passed by value, so we do not see 'id' outside the textarea() method
+        //HACK: $htmlOptions is passed by value, so we do not see 'id' outside the textarea() method
         CHtml::resolveNameID($model, $attribute, $htmlOptions);
 
         $this->addClass('wysihtml5-textarea', $htmlOptions);
