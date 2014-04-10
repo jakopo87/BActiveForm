@@ -28,6 +28,12 @@ class BActiveForm extends CWidget
 {
 
     /**
+     * Folder of published assets.
+     * @var string
+     */
+    private $assetFolder;
+
+    /**
      * Action url of the form.
      * @var string
      */
@@ -127,6 +133,8 @@ class BActiveForm extends CWidget
     {
         $this->htmlOptions['action'] = $this->action;
         $this->htmlOptions['method'] = $this->method;
+
+        $this->assetFolder = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
 
         echo BHtml::openForm($this->htmlOptions);
     }
@@ -292,6 +300,7 @@ class BActiveForm extends CWidget
      */
     public function textEditor($model, $attribute, $htmlOptions = array())
     {
+        //TODO: test js
         //HACK: $htmlOptions is passed by value, so we do not see 'id' outside the textarea() method
         CHtml::resolveNameID($model, $attribute, $htmlOptions);
         $this->addClass('wysihtml5-textarea', $htmlOptions);
@@ -300,10 +309,9 @@ class BActiveForm extends CWidget
 
         $render = $this->textArea($model, $attribute, $htmlOptions);
 
-        $assetsFolder = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
-        Yii::app()->clientScript->registerCssFile("{$assetsFolder}/wysihtml5/stylesheet.css");
-        Yii::app()->clientScript->registerScriptFile("{$assetsFolder}/wysihtml5/parser_rules/{$ruleSet}.js", CClientScript::POS_END);
-        Yii::app()->clientScript->registerScriptFile("{$assetsFolder}/wysihtml5/wysihtml5-0.3.0.min.js", CClientScript::POS_END);
+        Yii::app()->clientScript->registerCssFile("{$this->assetFolder}/wysihtml5/stylesheet.css");
+        Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/wysihtml5/parser_rules/{$ruleSet}.js", CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/wysihtml5/wysihtml5-0.3.0.min.js", CClientScript::POS_END);
 
         Yii::app()->clientScript->registerScript('script', <<<JS
 var editor = new wysihtml5.Editor("{$htmlOptions['id']}", { // id of textarea element
@@ -313,6 +321,31 @@ var editor = new wysihtml5.Editor("{$htmlOptions['id']}", { // id of textarea el
 JS
                 , CClientScript::POS_READY);
 
+        return $render;
+    }
+
+    /**
+     * Render a text input with a datetime picker.
+     * @param object $model Model object;
+     * @param string $attribute Name of the attribute;
+     * @param array $htmlOptions    List of attributes and other options:<br/>
+     *                              see {@link BHtml::tag()};
+     * @return string
+     */
+    public function dateTimePicker($model, $attribute, $htmlOptions = array())
+    {
+        CHtml::resolveNameID($model, $attribute, $htmlOptions);
+
+        $render = BHtml::input('text', $htmlOptions['name'], $htmlOptions);
+
+        $min = defined('YII_DEBUG') ? '.min' : '';
+        Yii::app()->clientScript->registerCssFile("{$this->assetFolder}/bootstrap-datetimepicker/css/bootstrap-datetimepicker{$min}.css");
+        Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/bootstrap-datetimepicker/js/moment-with-langs.min.js", CClientScript::POS_END);
+        Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js", CClientScript::POS_END);
+        Yii::app()->clientScript->registerScript('script', <<<JS
+$('#{$htmlOptions['id']}').datetimepicker();
+JS
+                , CClientScript::POS_READY);
         return $render;
     }
 
