@@ -334,6 +334,8 @@ JS
      */
     public function dateTimePicker($model, $attribute, $htmlOptions = array())
     {
+        $dateTimePickerOptions = json_encode($this->getOption('dateTimePickerOptions', $htmlOptions));
+
         CHtml::resolveNameID($model, $attribute, $htmlOptions);
 
         $render = BHtml::input('text', $htmlOptions['name'], $htmlOptions);
@@ -342,8 +344,8 @@ JS
         Yii::app()->clientScript->registerCssFile("{$this->assetFolder}/bootstrap-datetimepicker/css/bootstrap-datetimepicker{$min}.css");
         Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/bootstrap-datetimepicker/js/moment-with-langs.min.js", CClientScript::POS_END);
         Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js", CClientScript::POS_END);
-        Yii::app()->clientScript->registerScript('script', <<<JS
-$('#{$htmlOptions['id']}').datetimepicker();
+        Yii::app()->clientScript->registerScript('dateTimePicker-' . $htmlOptions['id'], <<<JS
+$('#{$htmlOptions['id']}').datetimepicker({$dateTimePickerOptions});
 JS
                 , CClientScript::POS_READY);
         return $render;
