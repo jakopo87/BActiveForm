@@ -318,14 +318,14 @@ class BActiveForm extends CWidget
             $editorOptions['stylesheets'] = "{$this->assetFolder}/wysihtml5/stylesheet.css";
         }
 
-        $editorOptionsJSON = json_encode($editorOptions);
+        $editorOptionsJSON = $editorOptions !== NULL ? json_encode($editorOptions) : array();
 
         $render = $this->textArea($model, $attribute, $htmlOptions);
 
         Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/wysihtml5/parser_rules/{$ruleSet}.js", CClientScript::POS_END);
         Yii::app()->clientScript->registerScriptFile("{$this->assetFolder}/wysihtml5/wysihtml5-0.3.0.min.js", CClientScript::POS_END);
         Yii::app()->clientScript->registerScript('wysihtml5-' . $htmlOptions['id'], <<<JS
-var editor = new wysihtml5.Editor("{$htmlOptions['id']}",{$editorOptionsJSON});
+var editor = new wysihtml5.Editor("{$htmlOptions['id']}", $editorOptionsJSON);
 JS
                 , CClientScript::POS_READY);
         return $render;
