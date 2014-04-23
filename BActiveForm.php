@@ -102,7 +102,7 @@ class BActiveForm extends CWidget
     {
         if($this->getOption('label', $this->htmlOptions) !== false && $this->getOption('label', $htmlOptions) !== false)
         {
-            return BHtml::label($model->getAttributeLabel($attribute), $this->getOption('labelOptions', $htmlOptions));
+            return BHtml::inputLabel($model->getAttributeLabel($attribute), $this->getOption('labelOptions', $htmlOptions));
         }
         else
         {
@@ -133,6 +133,9 @@ class BActiveForm extends CWidget
     {
         $this->htmlOptions['action'] = $this->action;
         $this->htmlOptions['method'] = $this->method;
+
+        /* HACK: It tries to use C:\xampp\php\assets as basepath */
+        Yii::app()->getAssetManager()->setBasePath(Yii::app()->basePath);
 
         $this->assetFolder = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
 
@@ -318,7 +321,7 @@ class BActiveForm extends CWidget
             $editorOptions['stylesheets'] = "{$this->assetFolder}/wysihtml5/stylesheet.css";
         }
 
-        $editorOptionsJSON = $editorOptions !== NULL ? json_encode($editorOptions) : array();
+        $editorOptionsJSON = json_encode($editorOptions !== NULL ? $editorOptions : array());
 
         $render = $this->textArea($model, $attribute, $htmlOptions);
 
